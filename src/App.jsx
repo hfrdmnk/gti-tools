@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, Link } from 'react-router-dom'
 import Layout from './components/Layout'
 import { tools } from './tools'
 
@@ -15,9 +15,9 @@ function Home() {
 
         <div className="grid gap-3">
           {tools.map(tool => (
-            <a
+            <Link
               key={tool.id}
-              href={tool.path}
+              to={tool.path}
               className="group block p-4 bg-surface-secondary border border-border rounded-lg hover:border-accent transition-colors"
             >
               <div className="flex items-start justify-between">
@@ -29,7 +29,7 @@ function Home() {
                 </div>
                 <span className="text-text-muted group-hover:text-accent transition-colors">→</span>
               </div>
-            </a>
+            </Link>
           ))}
         </div>
 

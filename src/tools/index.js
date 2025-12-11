@@ -1,5 +1,6 @@
 import BinaryDivision from './division/BinaryDivision'
 import FloatVisualizer from './float/FloatVisualizer'
+import HackVisualizer from './hack/HackVisualizer'
 
 // Tool registry - add new tools here
 export const tools = [
@@ -16,6 +17,13 @@ export const tools = [
     path: '/float',
     description: 'Gleitkommazahlen visualisieren',
     component: FloatVisualizer,
+  },
+  {
+    id: 'hack',
+    name: 'Hack Assembly',
+    path: '/hack',
+    description: 'Register & Speicher visualisieren',
+    component: HackVisualizer,
   },
   // Add more tools:
   // {
