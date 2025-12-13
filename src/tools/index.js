@@ -1,6 +1,7 @@
 import BinaryDivision from './division/BinaryDivision'
 import FloatVisualizer from './float/FloatVisualizer'
 import HackVisualizer from './hack/HackVisualizer'
+import TwosComplement from './twoscomplement/TwosComplement'
 
 // Tool registry - add new tools here
 export const tools = [
@@ -24,6 +25,13 @@ export const tools = [
     path: '/hack',
     description: 'Register & Speicher visualisieren',
     component: HackVisualizer,
+  },
+  {
+    id: 'twoscomplement',
+    name: 'Zweierkomplement',
+    path: '/twoscomplement',
+    description: 'Darstellung negativer Zahlen',
+    component: TwosComplement,
   },
   // Add more tools:
   // {
