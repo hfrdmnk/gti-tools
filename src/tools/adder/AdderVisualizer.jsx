@@ -509,97 +509,101 @@ function Chapter2FullAdder({ onComplete }) {
         </ExplanationBox>
 
         {step >= 1 && (
-          <svg viewBox="0 0 500 220" className="w-full max-w-xl bg-surface rounded border border-border p-2">
+          <svg viewBox="0 0 560 240" className="w-full max-w-2xl bg-surface rounded border border-border">
             {/* Inputs */}
-            <text x={20} y={45} className="text-sm fill-text-secondary font-mono">A = {a}</text>
-            <text x={20} y={85} className="text-sm fill-text-secondary font-mono">B = {b}</text>
-            <text x={20} y={165} className="text-sm fill-text-secondary font-mono">Cin = {cin}</text>
+            <text x={15} y={40} className="text-xs fill-text-secondary font-mono">A={a}</text>
+            <text x={15} y={80} className="text-xs fill-text-secondary font-mono">B={b}</text>
+            <text x={15} y={180} className="text-xs fill-text-secondary font-mono">Cin={cin}</text>
 
             {/* Lines to HA1 */}
-            <line x1={60} y1={40} x2={100} y2={40} className="stroke-text-muted" strokeWidth={2} />
-            <line x1={60} y1={80} x2={100} y2={80} className="stroke-text-muted" strokeWidth={2} />
+            <line x1={45} y1={35} x2={100} y2={35} className="stroke-text-muted" strokeWidth={2} />
+            <line x1={45} y1={75} x2={100} y2={75} className="stroke-text-muted" strokeWidth={2} />
 
             {/* Half Adder 1 */}
-            <rect x={100} y={30} width={80} height={70} rx={4}
-              className={`fill-surface-secondary stroke-border`} strokeWidth={2}
+            <rect x={100} y={20} width={90} height={75} rx={4}
+              className="fill-surface-secondary stroke-border" strokeWidth={2}
             />
-            <text x={140} y={55} textAnchor="middle" className="text-sm fill-text-secondary font-medium">
+            <text x={145} y={45} textAnchor="middle" className="text-xs fill-text-secondary font-medium">
               Half Adder 1
             </text>
-            <text x={140} y={75} textAnchor="middle" className="text-xs fill-text-muted font-mono">
+            <text x={145} y={65} textAnchor="middle" className="text-[10px] fill-text-muted font-mono">
               S={ha1_sum}, C={ha1_carry}
             </text>
 
-            {/* HA1 outputs */}
-            <line x1={180} y1={50} x2={220} y2={50}
+            {/* HA1 Sum output -> HA2 input */}
+            <line x1={190} y1={45} x2={240} y2={45}
               className={`${ha1_sum ? 'stroke-accent' : 'stroke-text-muted'}`} strokeWidth={2}
             />
-            <text x={200} y={43} textAnchor="middle" className="text-xs fill-text-muted">S</text>
+            <text x={215} y={38} textAnchor="middle" className="text-[10px] fill-text-muted">S</text>
 
-            <line x1={180} y1={80} x2={200} y2={80}
+            {/* HA1 Carry output -> down and to OR */}
+            <line x1={190} y1={75} x2={210} y2={75}
               className={`${ha1_carry ? 'stroke-accent' : 'stroke-text-muted'}`} strokeWidth={2}
             />
-            <line x1={200} y1={80} x2={200} y2={190}
+            <line x1={210} y1={75} x2={210} y2={210}
               className={`${ha1_carry ? 'stroke-accent' : 'stroke-text-muted'}`} strokeWidth={2}
             />
-            <line x1={200} y1={190} x2={380} y2={190}
+            <line x1={210} y1={210} x2={420} y2={210}
               className={`${ha1_carry ? 'stroke-accent' : 'stroke-text-muted'}`} strokeWidth={2}
             />
-            <text x={185} y={95} className="text-xs fill-text-muted">C</text>
+            <text x={200} y={95} className="text-[10px] fill-text-muted">C</text>
 
-            {/* Cin line to HA2 */}
-            <line x1={60} y1={160} x2={220} y2={160}
-              className={`${cin ? 'stroke-accent' : 'stroke-text-muted'}`} strokeWidth={2}
+            {/* Cin line to HA2 - curved path */}
+            <line x1={45} y1={175} x2={230} y2={175}
+              className={`${cin ? 'stroke-orange-400' : 'stroke-text-muted'}`} strokeWidth={2}
             />
-            <line x1={220} y1={160} x2={220} y2={70}
-              className={`${cin ? 'stroke-accent' : 'stroke-text-muted'}`} strokeWidth={2}
+            <line x1={230} y1={175} x2={230} y2={65}
+              className={`${cin ? 'stroke-orange-400' : 'stroke-text-muted'}`} strokeWidth={2}
+            />
+            <line x1={230} y1={65} x2={240} y2={65}
+              className={`${cin ? 'stroke-orange-400' : 'stroke-text-muted'}`} strokeWidth={2}
             />
 
             {/* Half Adder 2 */}
-            <rect x={220} y={30} width={80} height={70} rx={4}
-              className={`fill-surface-secondary stroke-border`} strokeWidth={2}
+            <rect x={240} y={20} width={90} height={75} rx={4}
+              className="fill-surface-secondary stroke-border" strokeWidth={2}
             />
-            <text x={260} y={55} textAnchor="middle" className="text-sm fill-text-secondary font-medium">
+            <text x={285} y={45} textAnchor="middle" className="text-xs fill-text-secondary font-medium">
               Half Adder 2
             </text>
-            <text x={260} y={75} textAnchor="middle" className="text-xs fill-text-muted font-mono">
+            <text x={285} y={65} textAnchor="middle" className="text-[10px] fill-text-muted font-mono">
               S={ha2_sum}, C={ha2_carry}
             </text>
 
-            {/* HA2 Sum output */}
-            <line x1={300} y1={50} x2={400} y2={50}
+            {/* HA2 Sum output -> Final Sum */}
+            <line x1={330} y1={45} x2={420} y2={45}
               className={`${sum ? 'stroke-positive' : 'stroke-text-muted'}`} strokeWidth={2}
             />
-            <text x={420} y={55} className={`text-sm font-mono ${sum ? 'fill-positive' : 'fill-text-muted'}`}>
+            <text x={480} y={50} className={`text-xs font-mono ${sum ? 'fill-positive' : 'fill-text-muted'}`}>
               Sum = {sum}
             </text>
 
             {/* HA2 Carry to OR */}
-            <line x1={300} y1={80} x2={320} y2={80}
+            <line x1={330} y1={75} x2={360} y2={75}
               className={`${ha2_carry ? 'stroke-accent' : 'stroke-text-muted'}`} strokeWidth={2}
             />
-            <line x1={320} y1={80} x2={320} y2={170}
+            <line x1={360} y1={75} x2={360} y2={190}
               className={`${ha2_carry ? 'stroke-accent' : 'stroke-text-muted'}`} strokeWidth={2}
             />
-            <line x1={320} y1={170} x2={380} y2={170}
+            <line x1={360} y1={190} x2={420} y2={190}
               className={`${ha2_carry ? 'stroke-accent' : 'stroke-text-muted'}`} strokeWidth={2}
             />
 
             {/* OR Gate */}
-            <rect x={380} y={160} width={50} height={40} rx={4}
+            <rect x={420} y={175} width={50} height={50} rx={4}
               className={`${carry ? 'fill-accent/20 stroke-accent' : 'fill-surface-secondary stroke-border'}`}
               strokeWidth={2}
             />
-            <text x={405} y={185} textAnchor="middle" className={`text-sm font-mono ${carry ? 'fill-accent' : 'fill-text-muted'}`}>
+            <text x={445} y={205} textAnchor="middle" className={`text-xs font-mono ${carry ? 'fill-accent' : 'fill-text-muted'}`}>
               OR
             </text>
 
             {/* Final Carry output */}
-            <line x1={430} y1={180} x2={450} y2={180}
+            <line x1={470} y1={200} x2={490} y2={200}
               className={`${carry ? 'stroke-positive' : 'stroke-text-muted'}`} strokeWidth={2}
             />
-            <text x={455} y={185} className={`text-sm font-mono ${carry ? 'fill-positive' : 'fill-text-muted'}`}>
-              Cout = {carry}
+            <text x={500} y={205} className={`text-xs font-mono ${carry ? 'fill-positive' : 'fill-text-muted'}`}>
+              Cout={carry}
             </text>
           </svg>
         )}
@@ -733,7 +737,8 @@ function Chapter3RippleCarry({ onComplete }) {
       </div>
 
       {/* Ripple Carry Diagram */}
-      <svg viewBox="0 0 600 200" className="w-full bg-surface rounded border border-border">
+      <div className="overflow-x-auto">
+        <svg viewBox="0 0 600 180" className="w-full min-w-[500px] max-w-3xl mx-auto bg-surface rounded border border-border">
         {/* Bit labels */}
         {[0, 1, 2, 3].map(i => {
           const x = 500 - i * 130
@@ -838,7 +843,8 @@ function Chapter3RippleCarry({ onComplete }) {
         >
           c₄={tick >= maxTicks ? carries[4] : '?'}
         </text>
-      </svg>
+        </svg>
+      </div>
 
       {/* Explanation based on tick */}
       <ExplanationBox type={tick >= maxTicks ? 'success' : 'info'}>
@@ -912,29 +918,96 @@ function Chapter4Problem({ onComplete }) {
           <span className="font-mono text-lg w-16">{bits} Bit</span>
         </div>
 
-        {/* Time complexity visualization */}
+        {/* Line chart comparing O(n) vs O(log n) */}
         <div className="bg-surface-secondary rounded p-4">
-          <div className="flex items-end gap-1 h-32">
-            {[4, 8, 16, 32, 64].map(n => {
-              const height = (n / 64) * 100
-              const isSelected = n === bits
-              return (
-                <div key={n} className="flex-1 flex flex-col items-center">
-                  <div
-                    className={`w-full rounded-t transition-all ${
-                      isSelected ? 'bg-accent' : 'bg-surface-tertiary'
-                    }`}
-                    style={{ height: `${height}%` }}
-                  />
-                  <span className={`text-xs mt-1 ${isSelected ? 'text-accent' : 'text-text-muted'}`}>
-                    {n}
-                  </span>
-                </div>
-              )
-            })}
-          </div>
-          <div className="text-center mt-2 text-sm text-text-muted">
-            Verzögerung: <span className="font-mono text-accent">{bits}</span> Takte
+          <svg viewBox="0 0 400 220" className="w-full max-w-lg mx-auto">
+            {/* Axes */}
+            <line x1={50} y1={170} x2={380} y2={170} className="stroke-text-muted" strokeWidth={1} />
+            <line x1={50} y1={170} x2={50} y2={20} className="stroke-text-muted" strokeWidth={1} />
+
+            {/* Y-axis labels */}
+            <text x={45} y={173} textAnchor="end" className="text-[10px] fill-text-muted">0</text>
+            <text x={45} y={95} textAnchor="end" className="text-[10px] fill-text-muted">32</text>
+            <text x={45} y={25} textAnchor="end" className="text-[10px] fill-text-muted">64</text>
+            <text x={20} y={100} textAnchor="middle" className="text-[10px] fill-text-muted" transform="rotate(-90, 20, 100)">Takte</text>
+
+            {/* X-axis labels */}
+            <text x={50} y={185} textAnchor="middle" className="text-[10px] fill-text-muted">4</text>
+            <text x={160} y={185} textAnchor="middle" className="text-[10px] fill-text-muted">24</text>
+            <text x={270} y={185} textAnchor="middle" className="text-[10px] fill-text-muted">44</text>
+            <text x={380} y={185} textAnchor="middle" className="text-[10px] fill-text-muted">64</text>
+            <text x={215} y={200} textAnchor="middle" className="text-[10px] fill-text-muted">Bit-Breite</text>
+
+            {/* Grid lines */}
+            <line x1={50} y1={95} x2={380} y2={95} className="stroke-border" strokeWidth={1} strokeDasharray="2,4" />
+
+            {/* O(n) line - Ripple Carry (red/negative) */}
+            <polyline
+              points={Array.from({length: 61}, (_, i) => {
+                const n = i + 4
+                const x = 50 + (i / 60) * 330
+                const y = 170 - (n / 64) * 150
+                return `${x},${y}`
+              }).join(' ')}
+              className="stroke-negative"
+              strokeWidth={2.5}
+              fill="none"
+            />
+
+            {/* O(log n) line - Optimized (green/positive) */}
+            <polyline
+              points={Array.from({length: 61}, (_, i) => {
+                const n = i + 4
+                const x = 50 + (i / 60) * 330
+                const y = 170 - (Math.ceil(Math.log2(n)) / 64) * 150
+                return `${x},${y}`
+              }).join(' ')}
+              className="stroke-positive"
+              strokeWidth={2.5}
+              fill="none"
+            />
+
+            {/* Current position marker */}
+            <line
+              x1={50 + ((bits - 4) / 60) * 330}
+              y1={20}
+              x2={50 + ((bits - 4) / 60) * 330}
+              y2={170}
+              className="stroke-accent"
+              strokeWidth={1.5}
+              strokeDasharray="4,4"
+            />
+
+            {/* Current value dots */}
+            <circle
+              cx={50 + ((bits - 4) / 60) * 330}
+              cy={170 - (bits / 64) * 150}
+              r={6}
+              className="fill-negative"
+            />
+            <circle
+              cx={50 + ((bits - 4) / 60) * 330}
+              cy={170 - (Math.ceil(Math.log2(bits)) / 64) * 150}
+              r={6}
+              className="fill-positive"
+            />
+
+            {/* Legend */}
+            <line x1={280} y1={30} x2={310} y2={30} className="stroke-negative" strokeWidth={2.5} />
+            <text x={315} y={34} className="text-[11px] fill-negative">O(n)</text>
+            <line x1={280} y1={48} x2={310} y2={48} className="stroke-positive" strokeWidth={2.5} />
+            <text x={315} y={52} className="text-[11px] fill-positive">O(log n)</text>
+          </svg>
+
+          <div className="text-center mt-4 grid grid-cols-2 gap-4 max-w-sm mx-auto">
+            <div className="p-2 rounded bg-negative/10 border border-negative/30">
+              <span className="text-negative font-mono text-xl font-bold">{bits}</span>
+              <span className="text-text-muted text-sm block">Takte (Ripple)</span>
+            </div>
+            <div className="p-2 rounded bg-positive/10 border border-positive/30">
+              <span className="text-positive font-mono text-xl font-bold">~{Math.ceil(Math.log2(bits))}</span>
+              <span className="text-text-muted text-sm block">Takte (Optimiert)</span>
+            </div>
           </div>
         </div>
       </div>
@@ -991,6 +1064,7 @@ function Chapter5CarryBypass({ onComplete }) {
   const [a, setA] = useState(15)
   const [b, setB] = useState(0)
   const [step, setStep] = useState(0)
+  const [animationStep, setAnimationStep] = useState(0)
 
   const aBits = [(a >> 3) & 1, (a >> 2) & 1, (a >> 1) & 1, a & 1]
   const bBits = [(b >> 3) & 1, (b >> 2) & 1, (b >> 1) & 1, b & 1]
@@ -998,6 +1072,12 @@ function Chapter5CarryBypass({ onComplete }) {
   // Calculate propagate signals
   const p = aBits.map((ai, i) => ai ^ bBits[i])
   const allPropagate = p.every(pi => pi === 1)
+
+  // Reset animation when inputs change
+  const handleInputChange = (setter) => (value) => {
+    setter(value)
+    setAnimationStep(0)
+  }
 
   return (
     <div className="p-6 space-y-6 max-w-4xl mx-auto">
@@ -1034,8 +1114,8 @@ function Chapter5CarryBypass({ onComplete }) {
       {step >= 1 && (
         <>
           <div className="flex items-center gap-6 flex-wrap">
-            <BitInput label="A" value={a} onChange={setA} bits={4} />
-            <BitInput label="B" value={b} onChange={setB} bits={4} />
+            <BitInput label="A" value={a} onChange={handleInputChange(setA)} bits={4} />
+            <BitInput label="B" value={b} onChange={handleInputChange(setB)} bits={4} />
           </div>
 
           {/* Propagate visualization */}
@@ -1058,7 +1138,7 @@ function Chapter5CarryBypass({ onComplete }) {
               <span className="text-sm">
                 Alle P = 1?
                 <span className={`ml-2 font-bold ${allPropagate ? 'text-positive' : 'text-text-muted'}`}>
-                  {allPropagate ? 'JA — Bypass aktiv!' : 'NEIN'}
+                  {allPropagate ? 'JA — Bypass möglich!' : 'NEIN — normaler Ripple-Pfad'}
                 </span>
               </span>
             </div>
@@ -1083,58 +1163,287 @@ function Chapter5CarryBypass({ onComplete }) {
         </ExplanationBox>
       )}
 
-      {/* Diagram */}
+      {/* Animated comparison */}
       {step >= 1 && (
-        <svg viewBox="0 0 500 150" className="w-full bg-surface rounded border border-border">
-          {/* Normal path */}
-          <text x={20} y={30} className="text-xs fill-text-muted">Normaler Weg:</text>
-          <line x1={100} y1={25} x2={450} y2={25} className="stroke-text-muted" strokeWidth={2} strokeDasharray="4,4" />
+        <div className="space-y-4">
+          <h3 className="text-sm font-medium text-text-secondary">Vergleich: Ripple vs Bypass</h3>
 
-          {/* Bypass path */}
-          <text x={20} y={80} className="text-xs fill-text-muted">Bypass:</text>
-          <line
-            x1={100} y1={75} x2={450} y2={75}
-            className={`${allPropagate ? 'stroke-positive' : 'stroke-text-muted'}`}
-            strokeWidth={allPropagate ? 3 : 2}
-          />
-          {allPropagate && (
-            <text x={275} y={95} textAnchor="middle" className="text-sm fill-positive">
-              c₄ = c₀ (direkt!)
-            </text>
-          )}
+          {/* Animation controls */}
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => setAnimationStep(0)}
+              className="p-2 rounded bg-surface hover:bg-surface-tertiary"
+            >
+              <RotateCcw size={16} />
+            </button>
+            <button
+              onClick={() => setAnimationStep(Math.max(0, animationStep - 1))}
+              disabled={animationStep === 0}
+              className="p-2 rounded bg-surface hover:bg-surface-tertiary disabled:opacity-30"
+            >
+              <ChevronLeft size={16} />
+            </button>
+            <div className="flex-1 bg-surface-secondary rounded h-2 relative">
+              <div
+                className="absolute left-0 top-0 h-full bg-accent rounded transition-all"
+                style={{ width: `${(animationStep / 5) * 100}%` }}
+              />
+            </div>
+            <button
+              onClick={() => setAnimationStep(Math.min(5, animationStep + 1))}
+              disabled={animationStep >= 5}
+              className="p-2 rounded bg-accent text-white hover:bg-accent-hover disabled:opacity-30"
+            >
+              <ChevronRight size={16} />
+            </button>
+            <span className="text-sm text-text-muted font-mono w-20">
+              Schritt {animationStep}/5
+            </span>
+          </div>
 
-          {/* P signals */}
-          {[0, 1, 2, 3].map(i => {
-            const x = 140 + i * 90
-            return (
-              <g key={i}>
-                <circle
-                  cx={x} cy={50} r={15}
-                  className={`${p[i] ? 'fill-positive/20 stroke-positive' : 'fill-negative/20 stroke-negative'}`}
-                  strokeWidth={2}
-                />
-                <text x={x} y={55} textAnchor="middle" className={`text-sm font-mono ${p[i] ? 'fill-positive' : 'fill-negative'}`}>
-                  {p[i]}
+          {/* Side-by-side comparison */}
+          <div className="grid md:grid-cols-2 gap-4">
+            {/* Ripple Carry Path */}
+            <div className={`p-4 rounded border-2 ${!allPropagate ? 'border-accent' : 'border-border'} bg-surface`}>
+              <div className="text-sm font-medium mb-3 flex items-center justify-between">
+                <span>Ripple Carry</span>
+                <span className={`text-xs px-2 py-1 rounded ${animationStep >= 4 ? 'bg-negative/20 text-negative' : 'bg-surface-secondary text-text-muted'}`}>
+                  {animationStep >= 4 ? '4 Takte' : `${Math.min(animationStep, 4)}/4`}
+                </span>
+              </div>
+
+              <svg viewBox="0 0 220 120" className="w-full">
+                {/* Adders in row */}
+                {[0, 1, 2, 3].map(i => {
+                  const x = 20 + i * 50
+                  const isActive = animationStep === (i + 1)
+                  const isDone = animationStep > (i + 1)
+                  return (
+                    <g key={i}>
+                      <rect
+                        x={x} y={30} width={40} height={35} rx={3}
+                        className={`transition-all duration-300 ${
+                          isActive
+                            ? 'fill-accent/30 stroke-accent'
+                            : isDone
+                              ? 'fill-positive/20 stroke-positive'
+                              : 'fill-surface-secondary stroke-border'
+                        }`}
+                        strokeWidth={2}
+                      />
+                      <text x={x + 20} y={52} textAnchor="middle" className="text-[10px] fill-text-muted font-mono">
+                        FA{3-i}
+                      </text>
+                      {/* Carry arrow */}
+                      {i < 3 && (
+                        <line
+                          x1={x + 40} y1={47} x2={x + 50} y2={47}
+                          className={`transition-all ${isDone ? 'stroke-positive' : isActive ? 'stroke-accent' : 'stroke-text-muted'}`}
+                          strokeWidth={2}
+                          markerEnd="url(#arrowhead)"
+                        />
+                      )}
+                      {/* Step number */}
+                      <text x={x + 20} y={85} textAnchor="middle" className={`text-xs font-mono ${isActive ? 'fill-accent' : isDone ? 'fill-positive' : 'fill-text-muted'}`}>
+                        T{i + 1}
+                      </text>
+                    </g>
+                  )
+                })}
+                {/* Input */}
+                <text x={10} y={52} className="text-[10px] fill-text-muted">c₀</text>
+                {/* Output */}
+                <text x={215} y={52} textAnchor="end" className={`text-[10px] font-mono ${animationStep >= 4 ? 'fill-positive' : 'fill-text-muted'}`}>
+                  c₄
                 </text>
-                <text x={x} y={130} textAnchor="middle" className="text-xs fill-text-muted font-mono">
-                  P{3 - i}
-                </text>
-              </g>
-            )
-          })}
-        </svg>
+              </svg>
+
+              <div className="text-xs text-text-muted text-center mt-2">
+                Carry muss durch jeden Addierer
+              </div>
+            </div>
+
+            {/* Bypass Path */}
+            <div className={`p-4 rounded border-2 ${allPropagate ? 'border-positive' : 'border-border'} bg-surface`}>
+              <div className="text-sm font-medium mb-3 flex items-center justify-between">
+                <span>Carry Bypass</span>
+                <span className={`text-xs px-2 py-1 rounded ${
+                  allPropagate && animationStep >= 1
+                    ? 'bg-positive/20 text-positive'
+                    : animationStep >= 4
+                      ? 'bg-negative/20 text-negative'
+                      : 'bg-surface-secondary text-text-muted'
+                }`}>
+                  {allPropagate ? (animationStep >= 1 ? '1 Takt!' : '0/1') : (animationStep >= 4 ? '4 Takte' : `${Math.min(animationStep, 4)}/4`)}
+                </span>
+              </div>
+
+              <svg viewBox="0 0 220 120" className="w-full">
+                {/* P signals and bypass line */}
+                {allPropagate ? (
+                  <>
+                    {/* Bypass line - highlighted */}
+                    <line
+                      x1={20} y1={25} x2={200} y2={25}
+                      className={`transition-all duration-500 ${animationStep >= 1 ? 'stroke-positive' : 'stroke-text-muted'}`}
+                      strokeWidth={animationStep >= 1 ? 3 : 2}
+                    />
+                    {animationStep >= 1 && (
+                      <text x={110} y={18} textAnchor="middle" className="text-xs fill-positive font-medium">
+                        BYPASS AKTIV!
+                      </text>
+                    )}
+
+                    {/* Adders (grayed out when bypass active) */}
+                    {[0, 1, 2, 3].map(i => {
+                      const x = 20 + i * 50
+                      return (
+                        <g key={i} className={animationStep >= 1 ? 'opacity-30' : ''}>
+                          <rect
+                            x={x} y={45} width={40} height={30} rx={3}
+                            className="fill-surface-secondary stroke-border"
+                            strokeWidth={1}
+                          />
+                          <text x={x + 20} y={64} textAnchor="middle" className="text-[8px] fill-text-muted font-mono">
+                            FA{3-i}
+                          </text>
+                        </g>
+                      )
+                    })}
+
+                    {/* P signals */}
+                    {[0, 1, 2, 3].map(i => {
+                      const x = 40 + i * 50
+                      return (
+                        <g key={`p-${i}`}>
+                          <circle
+                            cx={x} cy={95} r={10}
+                            className="fill-positive/20 stroke-positive"
+                            strokeWidth={2}
+                          />
+                          <text x={x} y={99} textAnchor="middle" className="text-[9px] fill-positive font-mono font-bold">
+                            1
+                          </text>
+                        </g>
+                      )
+                    })}
+                  </>
+                ) : (
+                  <>
+                    {/* Normal path when bypass not possible */}
+                    {[0, 1, 2, 3].map(i => {
+                      const x = 20 + i * 50
+                      const isActive = animationStep === (i + 1)
+                      const isDone = animationStep > (i + 1)
+                      return (
+                        <g key={i}>
+                          <rect
+                            x={x} y={30} width={40} height={35} rx={3}
+                            className={`transition-all duration-300 ${
+                              isActive
+                                ? 'fill-accent/30 stroke-accent'
+                                : isDone
+                                  ? 'fill-surface-tertiary stroke-text-muted'
+                                  : 'fill-surface-secondary stroke-border'
+                            }`}
+                            strokeWidth={2}
+                          />
+                          <text x={x + 20} y={52} textAnchor="middle" className="text-[10px] fill-text-muted font-mono">
+                            FA{3-i}
+                          </text>
+                          {i < 3 && (
+                            <line
+                              x1={x + 40} y1={47} x2={x + 50} y2={47}
+                              className={`${isDone ? 'stroke-text-muted' : 'stroke-text-muted'}`}
+                              strokeWidth={2}
+                            />
+                          )}
+                        </g>
+                      )
+                    })}
+
+                    {/* P signals showing blockage */}
+                    {[0, 1, 2, 3].map(i => {
+                      const x = 40 + i * 50
+                      const pVal = p[3 - i]
+                      return (
+                        <g key={`p-${i}`}>
+                          <circle
+                            cx={x} cy={95} r={10}
+                            className={pVal ? 'fill-positive/20 stroke-positive' : 'fill-negative/20 stroke-negative'}
+                            strokeWidth={2}
+                          />
+                          <text x={x} y={99} textAnchor="middle" className={`text-[9px] font-mono font-bold ${pVal ? 'fill-positive' : 'fill-negative'}`}>
+                            {pVal}
+                          </text>
+                        </g>
+                      )
+                    })}
+
+                    <text x={110} y={18} textAnchor="middle" className="text-[10px] fill-negative">
+                      Bypass blockiert (P≠1)
+                    </text>
+                  </>
+                )}
+
+                {/* Labels */}
+                <text x={10} y={100} className="text-[8px] fill-text-muted">P₃ P₂ P₁ P₀</text>
+              </svg>
+
+              <div className="text-xs text-text-muted text-center mt-2">
+                {allPropagate
+                  ? 'Alle P=1 → Carry springt direkt!'
+                  : 'Mindestens ein P=0 → kein Bypass'
+                }
+              </div>
+            </div>
+          </div>
+
+          {/* Explanation for current step */}
+          <ExplanationBox type={animationStep >= 5 ? (allPropagate ? 'success' : 'info') : 'info'}>
+            {animationStep === 0 && (
+              <p className="text-text-secondary">
+                Klicke auf "Weiter" um den Vergleich zu starten. Beobachte wie der Carry propagiert.
+              </p>
+            )}
+            {animationStep >= 1 && animationStep < 5 && !allPropagate && (
+              <p className="text-text-secondary">
+                <strong>Schritt {animationStep}:</strong> Bei Ripple Carry muss jeder Full Adder auf den vorherigen warten.
+                Da nicht alle P=1 sind, funktioniert der Bypass nicht.
+              </p>
+            )}
+            {animationStep >= 1 && animationStep < 5 && allPropagate && (
+              <p className="text-text-secondary">
+                <strong>Schritt {animationStep}:</strong> Alle P-Signale sind 1! Der Bypass leitet c₀ direkt zu c₄ weiter —
+                in nur <strong className="text-positive">1 Takt</strong> statt 4!
+              </p>
+            )}
+            {animationStep >= 5 && (
+              <>
+                <p className="font-medium text-accent">Ergebnis</p>
+                <p className="text-text-secondary mt-1">
+                  {allPropagate
+                    ? <>Ripple Carry: 4 Takte | <strong className="text-positive">Bypass: 1 Takt</strong> — 4× schneller!</>
+                    : <>Ohne Bypass: Beide Methoden brauchen 4 Takte. Der Bypass hilft nur wenn alle P=1 sind.</>
+                  }
+                </p>
+              </>
+            )}
+          </ExplanationBox>
+        </div>
       )}
 
       {/* Benefit */}
-      {step >= 1 && (
+      {step >= 1 && animationStep >= 5 && (
         <ExplanationBox>
-          <p className="font-medium text-text-secondary">Vorteil</p>
+          <p className="font-medium text-text-secondary">Praxis-Tipp</p>
           <p className="text-text-secondary mt-2">
-            Wenn der Bypass aktiv ist, sparen wir die Carry-Propagation komplett.
-            Im Worst-Case (kein Bypass) ist es wie Ripple Carry.
+            In echten Prozessoren teilt man die Bits in <strong>Gruppen</strong> (z.B. 4 Bit).
+            Jede Gruppe hat ihren eigenen Bypass.
           </p>
           <p className="text-text-secondary mt-2 text-sm">
-            In der Praxis teilt man die Bits in Gruppen und prüft den Bypass pro Gruppe — das reduziert die durchschnittliche Verzögerung erheblich.
+            Bei 64 Bit mit 4-Bit-Gruppen: Statt 64 Schritte im Worst-Case nur ~16 + einige Gruppen-Übersprünge.
+            Das ist ein guter Kompromiss zwischen Hardware-Aufwand und Geschwindigkeit.
           </p>
         </ExplanationBox>
       )}
@@ -1524,15 +1833,74 @@ function Chapter8CarrySave({ onComplete }) {
         </p>
         {step === 0 && (
           <button onClick={() => setStep(1)} className="mt-2 text-sm text-accent hover:underline">
-            Zeige die Lösung →
+            Zeige ein Beispiel →
           </button>
         )}
       </ExplanationBox>
 
+      {/* Multiplication Example */}
+      {step >= 1 && (
+        <div className="space-y-4">
+          <h3 className="text-sm font-medium text-text-secondary">Beispiel: Binäre Multiplikation</h3>
+
+          <div className="bg-surface-secondary rounded p-4">
+            <div className="font-mono text-sm space-y-1 max-w-xs mx-auto">
+              <div className="flex justify-end items-center gap-2">
+                <span className="text-text-muted text-xs">(3)</span>
+                <span className="text-accent">1 1</span>
+              </div>
+              <div className="flex justify-end items-center gap-2">
+                <span className="text-text-muted text-xs">(2)</span>
+                <span>× <span className="text-accent">1 0</span></span>
+              </div>
+              <div className="border-t border-border my-1"></div>
+              <div className="flex justify-end items-center gap-2">
+                <span className="text-text-muted text-xs">3×0</span>
+                <span className="text-text-muted">0 0</span>
+              </div>
+              <div className="flex justify-end items-center gap-2">
+                <span className="text-text-muted text-xs">3×1, shift</span>
+                <span className="text-positive">1 1 <span className="text-text-muted">·</span></span>
+              </div>
+              <div className="border-t border-border my-1"></div>
+              <div className="flex justify-end items-center gap-2">
+                <span className="text-text-muted text-xs">(6)</span>
+                <span className="text-positive font-bold">1 1 0</span>
+              </div>
+            </div>
+
+            <p className="text-xs text-text-muted text-center mt-3">
+              2 Bits × 2 Bits = 2 Partialprodukte
+            </p>
+          </div>
+
+          <ExplanationBox type="problem">
+            <p className="font-medium text-negative">Das skaliert schlecht!</p>
+            <div className="grid grid-cols-3 gap-4 mt-3 text-center text-sm">
+              <div>
+                <div className="font-mono text-lg">4×4</div>
+                <div className="text-text-muted">4 Partialprodukte</div>
+              </div>
+              <div>
+                <div className="font-mono text-lg">8×8</div>
+                <div className="text-text-muted">8 Partialprodukte</div>
+              </div>
+              <div>
+                <div className="font-mono text-lg text-negative">32×32</div>
+                <div className="text-text-muted">32 Partialprodukte!</div>
+              </div>
+            </div>
+            <p className="text-text-secondary mt-3 text-sm">
+              All diese Zahlen müssen addiert werden. Mit normalen Addierern: n-1 Additionen, jede mit Carry-Propagation!
+            </p>
+          </ExplanationBox>
+        </div>
+      )}
+
       {/* CSA concept */}
       {step >= 1 && (
         <>
-          <h3 className="text-sm font-medium text-text-secondary">Carry-Save Adder (CSA)</h3>
+          <h3 className="text-sm font-medium text-text-secondary">Die Lösung: Carry-Save Adder (CSA)</h3>
 
           <ExplanationBox type="aha">
             <p className="font-medium text-accent">Die Idee</p>
@@ -1541,10 +1909,14 @@ function Chapter8CarrySave({ onComplete }) {
             </p>
             <ul className="text-text-secondary mt-2 text-sm list-disc list-inside space-y-1">
               <li>3 Eingänge → 2 Ausgänge (Sum + Carry-Vektor)</li>
-              <li>Alle Bit-Positionen parallel, KEINE Carry-Propagation</li>
-              <li>Der Carry wird zur nächsten Position "gespeichert"</li>
+              <li>Alle Bit-Positionen parallel, <strong>KEINE</strong> Carry-Propagation</li>
+              <li>Der Carry wird zur nächsten Position "gespeichert" (verschoben)</li>
             </ul>
           </ExplanationBox>
+
+          <p className="text-sm text-text-secondary">
+            Teste den CSA mit den Werten A, B, C oben — beobachte wie 3 Zahlen zu 2 Zahlen werden:
+          </p>
 
           {/* CSA visualization */}
           <div className="bg-surface-secondary rounded p-4">
