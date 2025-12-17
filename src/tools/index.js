@@ -1,3 +1,4 @@
+import AdderVisualizer from './adder/AdderVisualizer'
 import BinaryDivision from './division/BinaryDivision'
 import FloatVisualizer from './float/FloatVisualizer'
 import HackVisualizer from './hack/HackVisualizer'
@@ -6,6 +7,13 @@ import NormalFormVisualizer from './normalform/NormalFormVisualizer'
 
 // Tool registry - add new tools here (sorted alphabetically by name)
 export const tools = [
+  {
+    id: 'adder',
+    name: 'Addierer',
+    path: '/adder',
+    description: 'Ripple, Bypass, Select, Prefix & Wallace Tree',
+    component: AdderVisualizer,
+  },
   {
     id: 'division',
     name: 'Binary Division',
