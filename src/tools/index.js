@@ -2,8 +2,9 @@ import BinaryDivision from './division/BinaryDivision'
 import FloatVisualizer from './float/FloatVisualizer'
 import HackVisualizer from './hack/HackVisualizer'
 import TwosComplement from './twoscomplement/TwosComplement'
+import NormalFormVisualizer from './normalform/NormalFormVisualizer'
 
-// Tool registry - add new tools here
+// Tool registry - add new tools here (sorted alphabetically by name)
 export const tools = [
   {
     id: 'division',
@@ -13,6 +14,13 @@ export const tools = [
     component: BinaryDivision,
   },
   {
+    id: 'hack',
+    name: 'Hack Assembly',
+    path: '/hack',
+    description: 'Register & Speicher visualisieren',
+    component: HackVisualizer,
+  },
+  {
     id: 'float',
     name: 'IEEE 754 Float',
     path: '/float',
@@ -20,11 +28,11 @@ export const tools = [
     component: FloatVisualizer,
   },
   {
-    id: 'hack',
-    name: 'Hack Assembly',
-    path: '/hack',
-    description: 'Register & Speicher visualisieren',
-    component: HackVisualizer,
+    id: 'normalform',
+    name: 'Normalformen',
+    path: '/normalform',
+    description: 'DNF & KNF verstehen',
+    component: NormalFormVisualizer,
   },
   {
     id: 'twoscomplement',
