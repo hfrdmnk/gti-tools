@@ -738,11 +738,12 @@ function Chapter3RippleCarry({ onComplete }) {
 
       {/* Ripple Carry Diagram */}
       <div className="overflow-x-auto">
-        <svg viewBox="0 0 600 180" className="w-full min-w-[500px] max-w-3xl mx-auto bg-surface rounded border border-border">
+        <svg viewBox="0 0 660 180" className="w-full min-w-[500px] max-w-3xl mx-auto bg-surface rounded border border-border">
         {/* Bit labels */}
         {[0, 1, 2, 3].map(i => {
-          const x = 500 - i * 130
-          const computed = tick > (3 - i)
+          const x = 520 - i * 130
+          const isActive = tick === (i + 1)
+          const computed = tick > i
           return (
             <g key={`labels-${i}`}>
               <text x={x} y={25} textAnchor="middle" className="text-xs fill-text-muted font-mono">
@@ -763,7 +764,7 @@ function Chapter3RippleCarry({ onComplete }) {
               <rect
                 x={x - 35} y={70} width={70} height={45} rx={4}
                 className={`transition-all duration-300 ${
-                  tick === (4 - i)
+                  isActive
                     ? 'fill-accent/30 stroke-accent animate-pulse'
                     : computed
                       ? 'fill-positive/20 stroke-positive'
@@ -775,7 +776,7 @@ function Chapter3RippleCarry({ onComplete }) {
                 x={x} y={97}
                 textAnchor="middle"
                 className={`text-sm font-mono ${
-                  tick === (4 - i) ? 'fill-accent' : computed ? 'fill-positive' : 'fill-text-muted'
+                  isActive ? 'fill-accent' : computed ? 'fill-positive' : 'fill-text-muted'
                 }`}
               >
                 {i === 0 ? 'HA' : 'FA'}
@@ -800,16 +801,17 @@ function Chapter3RippleCarry({ onComplete }) {
 
         {/* Carry connections */}
         {[0, 1, 2].map(i => {
-          const x1 = 500 - i * 130 - 35
-          const x2 = 500 - (i + 1) * 130 + 35
+          const x1 = 520 - i * 130 - 35
+          const x2 = 520 - (i + 1) * 130 + 35
           const y = 92
-          const computed = tick > (3 - i)
+          const isActive = tick === (i + 1)
+          const computed = tick > i
           return (
             <g key={`carry-${i}`}>
               <line
                 x1={x1} y1={y} x2={x2} y2={y}
                 className={`transition-all duration-300 ${
-                  tick === (4 - i) ? 'stroke-accent' : computed ? 'stroke-positive' : 'stroke-text-muted'
+                  isActive ? 'stroke-accent' : computed ? 'stroke-positive' : 'stroke-text-muted'
                 }`}
                 strokeWidth={2}
               />
@@ -826,18 +828,14 @@ function Chapter3RippleCarry({ onComplete }) {
           )
         })}
 
-        {/* Input c0 */}
-        <line x1={540} y1={92} x2={565} y2={92} className="stroke-text-muted" strokeWidth={1} />
-        <text x={575} y={96} className="text-xs fill-text-muted font-mono">c₀=0</text>
-
         {/* Output c4 */}
         <line
-          x1={60} y1={92} x2={35} y2={92}
+          x1={90} y1={92} x2={50} y2={92}
           className={`${tick >= maxTicks ? 'stroke-positive' : 'stroke-text-muted'}`}
           strokeWidth={2}
         />
         <text
-          x={25} y={96}
+          x={45} y={96}
           textAnchor="end"
           className={`text-xs font-mono ${tick >= maxTicks ? 'fill-positive' : 'fill-text-muted'}`}
         >
@@ -850,13 +848,13 @@ function Chapter3RippleCarry({ onComplete }) {
       <ExplanationBox type={tick >= maxTicks ? 'success' : 'info'}>
         {tick === 0 && (
           <p className="text-text-secondary">
-            Klicke auf "Weiter" um zu sehen, wie der Carry durch die Addierer rieselt.
+            Klicke auf "Weiter" um zu sehen, wie der Carry durch die Addierer rieselt — von rechts nach links!
           </p>
         )}
         {tick > 0 && tick < maxTicks && (
           <p className="text-text-secondary">
-            <strong>Takt {tick}:</strong> Addierer {4 - tick} berechnet.
-            Der Carry c{4 - tick + 1} ist jetzt {carries[4 - tick + 1]}.
+            <strong>Takt {tick}:</strong> Bit {tick - 1} ({tick === 1 ? 'HA' : 'FA'}) berechnet.
+            Der Carry c{tick} ist jetzt {carries[tick]}.
             {tick < 4 && ' Der nächste Addierer muss auf diesen Carry warten.'}
           </p>
         )}
@@ -1066,6 +1064,16 @@ function Chapter5CarryBypass({ onComplete }) {
   const [step, setStep] = useState(0)
   const [animationStep, setAnimationStep] = useState(0)
 
+  // Demo FA state for interactive explanation
+  const [demoA, setDemoA] = useState(0)
+  const [demoB, setDemoB] = useState(1)
+  const [demoCin, setDemoCin] = useState(0)
+
+  // Demo FA calculations
+  const demoP = demoA ^ demoB
+  const demoSum = demoA ^ demoB ^ demoCin
+  const demoCout = (demoA & demoB) | (demoCin & (demoA ^ demoB))
+
   const aBits = [(a >> 3) & 1, (a >> 2) & 1, (a >> 1) & 1, a & 1]
   const bBits = [(b >> 3) & 1, (b >> 2) & 1, (b >> 1) & 1, b & 1]
 
@@ -1108,6 +1116,144 @@ function Chapter5CarryBypass({ onComplete }) {
             <p className="mt-2 font-mono text-accent">P = A ⊕ B</p>
           )}
         </ExplanationBox>
+
+        {/* Interactive FA demo showing c_in → c_out relationship */}
+        {step >= 1 && (
+          <div className="bg-surface-secondary rounded p-4 space-y-4">
+            <p className="text-sm font-medium text-text-secondary">Probiere es aus: Was passiert mit dem Carry?</p>
+
+            <div className="flex flex-col md:flex-row gap-6 items-center justify-center">
+              {/* Toggle buttons for A, B, c_in */}
+              <div className="flex gap-4">
+                <div className="text-center">
+                  <div className="text-xs text-text-muted mb-1">A</div>
+                  <button
+                    onClick={() => setDemoA(1 - demoA)}
+                    className={`w-12 h-12 rounded font-mono text-xl font-bold transition-colors ${
+                      demoA ? 'bg-accent text-white' : 'bg-surface text-text-muted border border-border'
+                    }`}
+                  >
+                    {demoA}
+                  </button>
+                </div>
+                <div className="text-center">
+                  <div className="text-xs text-text-muted mb-1">B</div>
+                  <button
+                    onClick={() => setDemoB(1 - demoB)}
+                    className={`w-12 h-12 rounded font-mono text-xl font-bold transition-colors ${
+                      demoB ? 'bg-accent text-white' : 'bg-surface text-text-muted border border-border'
+                    }`}
+                  >
+                    {demoB}
+                  </button>
+                </div>
+                <div className="text-center">
+                  <div className="text-xs text-text-muted mb-1">c_in</div>
+                  <button
+                    onClick={() => setDemoCin(1 - demoCin)}
+                    className={`w-12 h-12 rounded font-mono text-xl font-bold transition-colors ${
+                      demoCin ? 'bg-positive text-white' : 'bg-surface text-text-muted border border-border'
+                    }`}
+                  >
+                    {demoCin}
+                  </button>
+                </div>
+              </div>
+
+              {/* FA visualization */}
+              <div className="flex items-center gap-2">
+                <svg viewBox="0 0 180 110" className="w-48">
+                  {/* FA box */}
+                  <rect x={50} y={20} width={80} height={50} rx={4}
+                    className={`${demoP ? 'fill-positive/20 stroke-positive' : 'fill-surface stroke-border'}`}
+                    strokeWidth={2}
+                  />
+                  <text x={90} y={50} textAnchor="middle" className="text-sm fill-text-secondary font-mono">FA</text>
+
+                  {/* A input */}
+                  <line x1={70} y1={5} x2={70} y2={20} className="stroke-text-muted" strokeWidth={2} />
+                  <text x={60} y={12} textAnchor="end" className="text-[10px] fill-text-muted">{demoA}</text>
+
+                  {/* B input */}
+                  <line x1={110} y1={5} x2={110} y2={20} className="stroke-text-muted" strokeWidth={2} />
+                  <text x={120} y={12} textAnchor="start" className="text-[10px] fill-text-muted">{demoB}</text>
+
+                  {/* c_in input */}
+                  <line x1={5} y1={45} x2={50} y2={45}
+                    className={`${demoCin ? 'stroke-positive' : 'stroke-text-muted'}`}
+                    strokeWidth={2}
+                  />
+                  <text x={25} y={40} textAnchor="middle" className={`text-[10px] ${demoCin ? 'fill-positive' : 'fill-text-muted'}`}>
+                    c_in={demoCin}
+                  </text>
+
+                  {/* Sum output */}
+                  <line x1={70} y1={70} x2={70} y2={95} className="stroke-accent" strokeWidth={2} />
+                  <text x={70} y={106} textAnchor="middle" className="text-[10px] fill-accent">Sum={demoSum}</text>
+
+                  {/* c_out output */}
+                  <line x1={130} y1={45} x2={175} y2={45}
+                    className={`${demoCout ? 'stroke-positive' : 'stroke-text-muted'}`}
+                    strokeWidth={2}
+                  />
+                  <text x={155} y={40} textAnchor="middle" className={`text-[10px] ${demoCout ? 'fill-positive' : 'fill-text-muted'}`}>
+                    c_out={demoCout}
+                  </text>
+
+                  {/* P label */}
+                  <text x={90} y={65} textAnchor="middle" className={`text-[9px] font-mono ${demoP ? 'fill-positive' : 'fill-negative'}`}>
+                    P={demoP}
+                  </text>
+                </svg>
+              </div>
+
+              {/* Result explanation */}
+              <div className={`p-3 rounded text-center min-w-[180px] ${demoP ? 'bg-positive/20 border border-positive' : 'bg-negative/20 border border-negative'}`}>
+                {demoP ? (
+                  <>
+                    <div className="text-positive font-bold">c_out = c_in</div>
+                    <div className="text-sm text-positive mt-1">
+                      {demoCin} → {demoCout}
+                    </div>
+                    <div className="text-xs text-text-muted mt-2">
+                      Carry fließt durch!
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="text-negative font-bold">c_out ≠ c_in</div>
+                    <div className="text-sm text-negative mt-1">
+                      c_out = {demoCout} (fest)
+                    </div>
+                    <div className="text-xs text-text-muted mt-2">
+                      {demoA && demoB ? 'Erzeugt immer Carry' : 'Blockiert Carry'}
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+
+            <div className="text-xs text-text-muted text-center pt-2 border-t border-border">
+              <strong>Klicke auf c_in</strong> und beobachte: Bei <span className="text-positive">P=1</span> folgt c_out dem c_in.
+              Bei <span className="text-negative">P=0</span> ist c_out unabhängig von c_in.
+            </div>
+          </div>
+        )}
+
+        {/* Video link */}
+        {step >= 1 && (
+          <div className="flex items-center gap-2 text-sm text-text-muted">
+            <span>📺</span>
+            <a
+              href="https://www.youtube.com/watch?v=yj6wo5SCObY"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-accent hover:underline"
+            >
+              Video-Erklärung: Carry Look-Ahead (Englisch)
+            </a>
+          </div>
+        )}
       </div>
 
       {/* Interactive */}
@@ -1386,8 +1532,15 @@ function Chapter5CarryBypass({ onComplete }) {
                   </>
                 )}
 
-                {/* Labels */}
-                <text x={10} y={100} className="text-[8px] fill-text-muted">P₃ P₂ P₁ P₀</text>
+                {/* P labels under each circle */}
+                {[0, 1, 2, 3].map(i => {
+                  const x = 40 + i * 50
+                  return (
+                    <text key={`label-${i}`} x={x} y={115} textAnchor="middle" className="text-[8px] fill-text-muted">
+                      P{3 - i}
+                    </text>
+                  )
+                })}
               </svg>
 
               <div className="text-xs text-text-muted text-center mt-2">
@@ -1471,6 +1624,41 @@ function Chapter6CarrySelect({ onComplete }) {
         </p>
       </ExplanationBox>
 
+      {/* Context: Where does c_in come from? */}
+      <div className="bg-surface-secondary rounded p-4">
+        <p className="text-sm font-medium text-text-secondary mb-3">Kontext: Woher kommt c_in?</p>
+        <p className="text-sm text-text-muted mb-3">
+          In einem größeren Addierer wird dieser 4-Bit-Block mit anderen Blöcken verkettet.
+          Der c_in dieses Blocks ist der c_out des vorherigen Blocks — und den kennen wir noch nicht!
+        </p>
+
+        {/* Simple block diagram */}
+        <svg viewBox="0 0 400 60" className="w-full max-w-md mx-auto">
+          {/* Previous block */}
+          <rect x={20} y={15} width={100} height={30} rx={4} className="fill-surface stroke-border" strokeWidth={2} />
+          <text x={70} y={35} textAnchor="middle" className="text-[10px] fill-text-muted">Vorheriger Block</text>
+
+          {/* Arrow */}
+          <line x1={120} y1={30} x2={160} y2={30} className="stroke-accent" strokeWidth={2} />
+          <polygon points="160,30 152,25 152,35" className="fill-accent" />
+          <text x={140} y={22} textAnchor="middle" className="text-[8px] fill-accent font-mono">c_out=?</text>
+
+          {/* This block */}
+          <rect x={160} y={15} width={100} height={30} rx={4} className="fill-accent/20 stroke-accent" strokeWidth={2} />
+          <text x={210} y={32} textAnchor="middle" className="text-[10px] fill-accent font-medium">Dieser Block</text>
+          <text x={210} y={42} textAnchor="middle" className="text-[8px] fill-text-muted">(c_in=?)</text>
+
+          {/* Arrow to next */}
+          <line x1={260} y1={30} x2={300} y2={30} className="stroke-text-muted" strokeWidth={2} />
+          <polygon points="300,30 292,25 292,35" className="fill-text-muted" />
+          <text x={280} y={22} textAnchor="middle" className="text-[8px] fill-text-muted font-mono">c_out</text>
+
+          {/* Next block */}
+          <rect x={300} y={15} width={80} height={30} rx={4} className="fill-surface stroke-border" strokeWidth={2} />
+          <text x={340} y={35} textAnchor="middle" className="text-[10px] fill-text-muted">Nächster</text>
+        </svg>
+      </div>
+
       <div className="flex items-center gap-6 flex-wrap">
         <BitInput label="A" value={a} onChange={setA} bits={4} />
         <span className="text-xl text-text-muted">+</span>
@@ -1480,7 +1668,8 @@ function Chapter6CarrySelect({ onComplete }) {
       {/* The idea */}
       <ExplanationBox type={step >= 1 ? 'aha' : 'info'}>
         <p className="text-text-secondary">
-          Das Problem: Wir wissen nicht, ob c_in = 0 oder c_in = 1 sein wird.
+          Das Problem: Wir wissen nicht, ob c_in = 0 oder c_in = 1 sein wird,
+          weil der vorherige Block noch nicht fertig ist.
         </p>
         <p className="text-text-secondary mt-2">
           Die Lösung: Berechne <strong>beides parallel</strong> und wähle am Ende!
@@ -1640,6 +1829,19 @@ function Chapter7ParallelPrefix({ onComplete }) {
             </button>
           )}
         </ExplanationBox>
+
+        {/* Video link */}
+        <div className="flex items-center gap-2 text-sm text-text-muted">
+          <span>📺</span>
+          <a
+            href="https://www.youtube.com/watch?v=yj6wo5SCObY"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-accent hover:underline"
+          >
+            Video-Erklärung: Carry Look-Ahead Addierer (Englisch)
+          </a>
+        </div>
       </div>
 
       {/* G/P values */}
@@ -1981,6 +2183,121 @@ function Chapter8CarrySave({ onComplete }) {
             Erst ganz am Ende brauchen wir einen "normalen" Addierer mit Carry-Propagation.
           </p>
         </ExplanationBox>
+      )}
+
+      {/* Simplified Wallace Tree Diagram */}
+      {step >= 1 && (
+        <div className="space-y-3">
+          <h3 className="text-sm font-medium text-text-secondary">Wallace Tree: Das Prinzip</h3>
+
+          <div className="bg-surface-secondary rounded p-4">
+            <svg viewBox="0 0 340 200" className="w-full max-w-md mx-auto">
+              {/* Input numbers at top */}
+              <text x={170} y={15} textAnchor="middle" className="text-[10px] fill-text-muted">
+                6 Eingangszahlen (z.B. Partialprodukte)
+              </text>
+
+              {/* Level 0: 6 inputs */}
+              {[0, 1, 2, 3, 4, 5].map(i => (
+                <g key={`in-${i}`}>
+                  <rect x={30 + i * 50} y={25} width={30} height={20} rx={2}
+                    className="fill-surface stroke-border" strokeWidth={1} />
+                  <text x={45 + i * 50} y={38} textAnchor="middle" className="text-[8px] fill-text-muted">
+                    P{i}
+                  </text>
+                </g>
+              ))}
+
+              {/* Level 1: 2 CSA blocks (6→4) */}
+              <text x={20} y={70} className="text-[8px] fill-text-muted">Stufe 1:</text>
+
+              {/* CSA 1 */}
+              <rect x={45} y={55} width={55} height={25} rx={3}
+                className="fill-accent/20 stroke-accent" strokeWidth={2} />
+              <text x={72} y={71} textAnchor="middle" className="text-[9px] fill-accent font-mono">CSA</text>
+              <text x={72} y={78} textAnchor="middle" className="text-[7px] fill-text-muted">3→2</text>
+
+              {/* Lines to CSA 1 */}
+              <line x1={45} y1={45} x2={55} y2={55} className="stroke-text-muted" strokeWidth={1} />
+              <line x1={95} y1={45} x2={85} y2={55} className="stroke-text-muted" strokeWidth={1} />
+              <line x1={145} y1={45} x2={72} y2={55} className="stroke-text-muted" strokeWidth={1} />
+
+              {/* CSA 2 */}
+              <rect x={195} y={55} width={55} height={25} rx={3}
+                className="fill-accent/20 stroke-accent" strokeWidth={2} />
+              <text x={222} y={71} textAnchor="middle" className="text-[9px] fill-accent font-mono">CSA</text>
+              <text x={222} y={78} textAnchor="middle" className="text-[7px] fill-text-muted">3→2</text>
+
+              {/* Lines to CSA 2 */}
+              <line x1={195} y1={45} x2={205} y2={55} className="stroke-text-muted" strokeWidth={1} />
+              <line x1={245} y1={45} x2={235} y2={55} className="stroke-text-muted" strokeWidth={1} />
+              <line x1={295} y1={45} x2={222} y2={55} className="stroke-text-muted" strokeWidth={1} />
+
+              {/* Level 1 outputs (4 values) */}
+              <line x1={60} y1={80} x2={60} y2={95} className="stroke-accent" strokeWidth={1} />
+              <line x1={85} y1={80} x2={85} y2={95} className="stroke-accent" strokeWidth={1} />
+              <line x1={210} y1={80} x2={210} y2={95} className="stroke-accent" strokeWidth={1} />
+              <line x1={235} y1={80} x2={235} y2={95} className="stroke-accent" strokeWidth={1} />
+
+              {/* Level 2: 1 CSA + 1 passthrough (4→3) */}
+              <text x={20} y={115} className="text-[8px] fill-text-muted">Stufe 2:</text>
+
+              <rect x={95} y={100} width={55} height={25} rx={3}
+                className="fill-accent/20 stroke-accent" strokeWidth={2} />
+              <text x={122} y={116} textAnchor="middle" className="text-[9px] fill-accent font-mono">CSA</text>
+              <text x={122} y={123} textAnchor="middle" className="text-[7px] fill-text-muted">3→2</text>
+
+              {/* Lines to CSA */}
+              <line x1={60} y1={95} x2={105} y2={100} className="stroke-accent" strokeWidth={1} />
+              <line x1={85} y1={95} x2={122} y2={100} className="stroke-accent" strokeWidth={1} />
+              <line x1={210} y1={95} x2={140} y2={100} className="stroke-accent" strokeWidth={1} />
+
+              {/* Passthrough */}
+              <line x1={235} y1={95} x2={235} y2={145} className="stroke-text-muted" strokeWidth={1} strokeDasharray="3" />
+
+              {/* Level 2 outputs */}
+              <line x1={110} y1={125} x2={110} y2={145} className="stroke-accent" strokeWidth={1} />
+              <line x1={135} y1={125} x2={135} y2={145} className="stroke-accent" strokeWidth={1} />
+
+              {/* Level 3: Final CSA (3→2) */}
+              <text x={20} y={160} className="text-[8px] fill-text-muted">Stufe 3:</text>
+
+              <rect x={135} y={145} width={55} height={25} rx={3}
+                className="fill-positive/20 stroke-positive" strokeWidth={2} />
+              <text x={162} y={161} textAnchor="middle" className="text-[9px] fill-positive font-mono">CSA</text>
+              <text x={162} y={168} textAnchor="middle" className="text-[7px] fill-text-muted">3→2</text>
+
+              {/* Lines to final CSA */}
+              <line x1={110} y1={145} x2={145} y2={145} className="stroke-accent" strokeWidth={1} />
+              <line x1={135} y1={145} x2={162} y2={145} className="stroke-accent" strokeWidth={1} />
+              <line x1={235} y1={145} x2={180} y2={145} className="stroke-text-muted" strokeWidth={1} />
+
+              {/* Final outputs: Sum and Carry vectors */}
+              <line x1={150} y1={170} x2={150} y2={185} className="stroke-positive" strokeWidth={2} />
+              <line x1={175} y1={170} x2={175} y2={185} className="stroke-positive" strokeWidth={2} />
+
+              {/* Final Adder */}
+              <rect x={130} y={185} width={65} height={12} rx={2}
+                className="fill-surface stroke-border" strokeWidth={1} />
+              <text x={162} y={194} textAnchor="middle" className="text-[7px] fill-text-muted">
+                Finaler Addierer
+              </text>
+
+              {/* Labels for outputs */}
+              <text x={145} y={182} textAnchor="middle" className="text-[7px] fill-positive">S</text>
+              <text x={180} y={182} textAnchor="middle" className="text-[7px] fill-positive">C</text>
+
+              {/* Annotation */}
+              <text x={280} y={70} className="text-[8px] fill-text-muted">6 → 4</text>
+              <text x={280} y={115} className="text-[8px] fill-text-muted">4 → 3</text>
+              <text x={280} y={160} className="text-[8px] fill-text-muted">3 → 2</text>
+            </svg>
+
+            <div className="text-xs text-text-muted text-center mt-2">
+              Jede CSA-Schicht reduziert 3 Zahlen auf 2 — <strong>ohne</strong> Carry-Propagation!
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )
