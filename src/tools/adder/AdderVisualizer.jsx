@@ -11,8 +11,9 @@ const CHAPTERS = [
   { id: 4, title: 'Das Problem', subtitle: 'Die Wartezeit' },
   { id: 5, title: 'Carry Bypass', subtitle: 'Die Autobahn' },
   { id: 6, title: 'Carry Select', subtitle: 'Parallel spekulieren' },
-  { id: 7, title: 'Parallel Prefix', subtitle: 'Der elegante Höhepunkt' },
-  { id: 8, title: 'Carry Save', subtitle: 'Für Multiplikation' },
+  { id: 7, title: 'Carry Lookahead', subtitle: 'Die Formel' },
+  { id: 8, title: 'Parallel Prefix', subtitle: 'Der elegante Höhepunkt' },
+  { id: 9, title: 'Carry Save', subtitle: 'Für Multiplikation' },
 ]
 
 // ============================================
@@ -86,8 +87,9 @@ export default function AdderVisualizer() {
         {chapter === 4 && <Chapter4Problem onComplete={unlockNext} />}
         {chapter === 5 && <Chapter5CarryBypass onComplete={unlockNext} />}
         {chapter === 6 && <Chapter6CarrySelect onComplete={unlockNext} />}
-        {chapter === 7 && <Chapter7ParallelPrefix onComplete={unlockNext} />}
-        {chapter === 8 && <Chapter8CarrySave onComplete={unlockNext} />}
+        {chapter === 7 && <Chapter7CLA onComplete={unlockNext} />}
+        {chapter === 8 && <Chapter8ParallelPrefix onComplete={unlockNext} />}
+        {chapter === 9 && <Chapter9CarrySave onComplete={unlockNext} />}
       </div>
 
       {/* Chapter Navigation Footer */}
@@ -1605,6 +1607,426 @@ function Chapter5CarryBypass({ onComplete }) {
 }
 
 // ============================================
+// CHAPTER 7: CARRY LOOKAHEAD (CLA)
+// ============================================
+function Chapter7CLA({ onComplete }) {
+  const [a, setA] = useState(7)
+  const [b, setB] = useState(9)
+  const [step, setStep] = useState(0)
+
+  // Demo FA state for interactive G/P explanation
+  const [demoA, setDemoA] = useState(1)
+  const [demoB, setDemoB] = useState(1)
+  const [demoCin, setDemoCin] = useState(0)
+
+  // Demo calculations
+  const demoG = demoA & demoB
+  const demoP = demoA ^ demoB
+  const demoCout = (demoA & demoB) | (demoCin & (demoA ^ demoB))
+
+  // 4-bit calculations
+  const aBits = [(a >> 3) & 1, (a >> 2) & 1, (a >> 1) & 1, a & 1]
+  const bBits = [(b >> 3) & 1, (b >> 2) & 1, (b >> 1) & 1, b & 1]
+
+  // G and P for each bit (index 0 = MSB, index 3 = LSB)
+  const g = aBits.map((ai, i) => ai & bBits[i])
+  const p = aBits.map((ai, i) => ai ^ bBits[i])
+
+  // CLA carry equations (using LSB indexing: g[3]=g0, g[2]=g1, etc.)
+  const c0 = 0
+  const c1 = g[3] | (p[3] & c0)
+  const c2 = g[2] | (p[2] & g[3]) | (p[2] & p[3] & c0)
+  const c3 = g[1] | (p[1] & g[2]) | (p[1] & p[2] & g[3]) | (p[1] & p[2] & p[3] & c0)
+  const c4 = g[0] | (p[0] & g[1]) | (p[0] & p[1] & g[2]) | (p[0] & p[1] & p[2] & g[3]) | (p[0] & p[1] & p[2] & p[3] & c0)
+
+  // Determine behavior type for demo
+  const getBehavior = () => {
+    if (demoG) return { type: 'generate', label: 'Generate', color: 'positive', desc: 'Erzeugt Carry' }
+    if (demoP) return { type: 'propagate', label: 'Propagate', color: 'accent', desc: 'Leitet Carry weiter' }
+    return { type: 'kill', label: 'Kill', color: 'negative', desc: 'Blockiert Carry' }
+  }
+  const behavior = getBehavior()
+
+  return (
+    <div className="p-6 space-y-6 max-w-4xl mx-auto">
+      {/* Introduction */}
+      <ExplanationBox>
+        <p className="text-text-secondary">
+          Im Carry-Bypass-Kapitel haben wir <strong>P (Propagate)</strong> kennengelernt.
+          Aber es gibt noch ein zweites Signal, das wir bisher übersehen haben...
+        </p>
+      </ExplanationBox>
+
+      {/* Step 0: The Question */}
+      <ExplanationBox type={step >= 1 ? 'aha' : 'info'}>
+        <p className="text-text-secondary">
+          <strong>P</strong> sagt uns, wann ein Carry <em>durchfließt</em>. Aber was ist mit dem Fall,
+          wenn ein Carry <em>erzeugt</em> wird?
+        </p>
+        <p className="text-text-secondary mt-2">
+          Wenn <span className="font-mono">A=1</span> und <span className="font-mono">B=1</span>,
+          dann ist der Carry-Ausgang <em>immer</em> 1 – unabhängig vom Carry-Eingang!
+        </p>
+        {step === 0 && (
+          <button onClick={() => setStep(1)} className="mt-3 text-sm text-accent hover:underline">
+            Das ist das Generate-Signal! →
+          </button>
+        )}
+        {step >= 1 && (
+          <p className="mt-3 font-mono text-positive font-bold">G = A ∧ B</p>
+        )}
+      </ExplanationBox>
+
+      {/* Step 1: Interactive G/P Demo */}
+      {step >= 1 && (
+        <div className="bg-surface-secondary rounded p-4 space-y-4">
+          <p className="text-sm font-medium text-text-secondary">
+            Probiere es aus: Wann wird ein Carry erzeugt, weitergeleitet, oder blockiert?
+          </p>
+
+          <div className="flex flex-col md:flex-row gap-6 items-center justify-center">
+            {/* Toggle buttons */}
+            <div className="flex gap-4">
+              <div className="text-center">
+                <div className="text-xs text-text-muted mb-1">A</div>
+                <button
+                  onClick={() => setDemoA(1 - demoA)}
+                  className={`w-12 h-12 rounded font-mono text-xl font-bold transition-colors ${
+                    demoA ? 'bg-accent text-white' : 'bg-surface text-text-muted border border-border'
+                  }`}
+                >
+                  {demoA}
+                </button>
+              </div>
+              <div className="text-center">
+                <div className="text-xs text-text-muted mb-1">B</div>
+                <button
+                  onClick={() => setDemoB(1 - demoB)}
+                  className={`w-12 h-12 rounded font-mono text-xl font-bold transition-colors ${
+                    demoB ? 'bg-accent text-white' : 'bg-surface text-text-muted border border-border'
+                  }`}
+                >
+                  {demoB}
+                </button>
+              </div>
+              <div className="text-center">
+                <div className="text-xs text-text-muted mb-1">Cᵢₙ</div>
+                <button
+                  onClick={() => setDemoCin(1 - demoCin)}
+                  className={`w-12 h-12 rounded font-mono text-xl font-bold transition-colors ${
+                    demoCin ? 'bg-positive text-white' : 'bg-surface text-text-muted border border-border'
+                  }`}
+                >
+                  {demoCin}
+                </button>
+              </div>
+            </div>
+
+            {/* FA visualization */}
+            <svg viewBox="0 0 180 110" className="w-48">
+              <rect x={50} y={20} width={80} height={50} rx={4}
+                className={`fill-${behavior.color}/20 stroke-${behavior.color}`}
+                strokeWidth={2}
+              />
+              <text x={90} y={50} textAnchor="middle" className="text-sm fill-text-secondary font-mono">FA</text>
+
+              {/* A input */}
+              <line x1={70} y1={5} x2={70} y2={20} className="stroke-text-muted" strokeWidth={2} />
+              <text x={60} y={12} textAnchor="end" className="text-[10px] fill-text-muted">{demoA}</text>
+
+              {/* B input */}
+              <line x1={110} y1={5} x2={110} y2={20} className="stroke-text-muted" strokeWidth={2} />
+              <text x={120} y={12} textAnchor="start" className="text-[10px] fill-text-muted">{demoB}</text>
+
+              {/* Cin input */}
+              <line x1={5} y1={45} x2={50} y2={45}
+                className={demoCin ? 'stroke-positive' : 'stroke-text-muted'}
+                strokeWidth={2}
+              />
+              <text x={25} y={40} textAnchor="middle" className={`text-[10px] ${demoCin ? 'fill-positive' : 'fill-text-muted'}`}>
+                Cᵢₙ={demoCin}
+              </text>
+
+              {/* Cout output */}
+              <line x1={130} y1={45} x2={175} y2={45}
+                className={demoCout ? 'stroke-positive' : 'stroke-text-muted'}
+                strokeWidth={2}
+              />
+              <text x={155} y={40} textAnchor="middle" className={`text-[10px] ${demoCout ? 'fill-positive' : 'fill-text-muted'}`}>
+                Cₒᵤₜ={demoCout}
+              </text>
+
+              {/* G and P labels */}
+              <text x={65} y={65} className={`text-[9px] font-mono ${demoG ? 'fill-positive' : 'fill-text-muted'}`}>
+                G={demoG}
+              </text>
+              <text x={100} y={65} className={`text-[9px] font-mono ${demoP ? 'fill-accent' : 'fill-text-muted'}`}>
+                P={demoP}
+              </text>
+            </svg>
+
+            {/* Result explanation */}
+            <div className={`p-3 rounded text-center min-w-[160px] bg-${behavior.color}/20 border border-${behavior.color}`}>
+              <div className={`text-${behavior.color} font-bold`}>{behavior.label}</div>
+              <div className={`text-sm text-${behavior.color} mt-1`}>{behavior.desc}</div>
+              <div className="text-xs text-text-muted mt-2">
+                {behavior.type === 'generate' && 'Cₒᵤₜ = 1 (immer)'}
+                {behavior.type === 'propagate' && `Cₒᵤₜ = Cᵢₙ = ${demoCin}`}
+                {behavior.type === 'kill' && 'Cₒᵤₜ = 0 (immer)'}
+              </div>
+            </div>
+          </div>
+
+          {step === 1 && (
+            <div className="text-center pt-2 border-t border-border">
+              <button onClick={() => setStep(2)} className="text-sm text-accent hover:underline">
+                Zeige alle drei Fälle →
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Step 2: Three behaviors grid */}
+      {step >= 2 && (
+        <div className="space-y-3">
+          <h3 className="text-sm font-medium text-text-secondary">Die drei Verhaltensweisen</h3>
+          <div className="grid grid-cols-3 gap-3">
+            <div className={`p-3 rounded border text-center ${demoG ? 'bg-positive/20 border-positive' : 'bg-surface-secondary border-border'}`}>
+              <div className={`font-bold ${demoG ? 'text-positive' : 'text-text-muted'}`}>Generate</div>
+              <div className="font-mono text-sm mt-1">G = A ∧ B</div>
+              <div className="text-xs text-text-muted mt-2">A=1, B=1</div>
+              <div className="text-xs mt-1">→ Erzeugt Carry</div>
+            </div>
+            <div className={`p-3 rounded border text-center ${demoP && !demoG ? 'bg-accent/20 border-accent' : 'bg-surface-secondary border-border'}`}>
+              <div className={`font-bold ${demoP && !demoG ? 'text-accent' : 'text-text-muted'}`}>Propagate</div>
+              <div className="font-mono text-sm mt-1">P = A ⊕ B</div>
+              <div className="text-xs text-text-muted mt-2">A≠B</div>
+              <div className="text-xs mt-1">→ Leitet Carry weiter</div>
+            </div>
+            <div className={`p-3 rounded border text-center ${!demoG && !demoP ? 'bg-negative/20 border-negative' : 'bg-surface-secondary border-border'}`}>
+              <div className={`font-bold ${!demoG && !demoP ? 'text-negative' : 'text-text-muted'}`}>Kill</div>
+              <div className="font-mono text-sm mt-1">G=0, P=0</div>
+              <div className="text-xs text-text-muted mt-2">A=0, B=0</div>
+              <div className="text-xs mt-1">→ Blockiert Carry</div>
+            </div>
+          </div>
+
+          {step === 2 && (
+            <ExplanationBox type="aha">
+              <p className="text-text-secondary">
+                <strong>Die Schlüsseleinsicht:</strong> Mit G und P können wir das Verhalten jeder Bit-Position
+                vollständig beschreiben – <em>ohne</em> den Carry von vorher zu kennen!
+              </p>
+              <button onClick={() => setStep(3)} className="mt-2 text-sm text-accent hover:underline">
+                Was bedeutet das für die Berechnung? →
+              </button>
+            </ExplanationBox>
+          )}
+        </div>
+      )}
+
+      {/* Step 3: First carry equation */}
+      {step >= 3 && (
+        <div className="space-y-4">
+          <h3 className="text-sm font-medium text-text-secondary">Die Carry-Gleichung</h3>
+
+          <ExplanationBox type={step >= 4 ? 'info' : 'aha'}>
+            <p className="text-text-secondary">
+              Schreiben wir die Formel für den ersten Carry:
+            </p>
+            <div className="font-mono text-lg mt-3 p-3 bg-surface rounded text-center">
+              C₁ = G₀ + P₀ · C₀
+            </div>
+            <p className="text-text-secondary mt-3 text-sm">
+              <em>"Carry 1 ist 1, wenn Position 0 einen Carry <span className="text-positive">erzeugt</span>,
+              oder wenn sie einen eingehenden Carry <span className="text-accent">weiterleitet</span>."</em>
+            </p>
+            {step === 3 && (
+              <button onClick={() => setStep(4)} className="mt-2 text-sm text-accent hover:underline">
+                Was ist mit C₂? →
+              </button>
+            )}
+          </ExplanationBox>
+        </div>
+      )}
+
+      {/* Step 4: Second carry equation - the substitution */}
+      {step >= 4 && (
+        <ExplanationBox type="aha">
+          <p className="text-text-secondary font-medium">Der Trick: Einsetzen!</p>
+          <div className="font-mono text-sm mt-3 space-y-2 p-3 bg-surface rounded">
+            <p className="text-text-muted">C₂ = G₁ + P₁ · C₁</p>
+            <p className="text-text-muted">C₂ = G₁ + P₁ · <span className="text-accent">(G₀ + P₀ · C₀)</span></p>
+            <p className="text-text-primary font-bold">C₂ = G₁ + P₁·G₀ + P₁·P₀·C₀</p>
+          </div>
+          <p className="text-text-secondary mt-3">
+            <strong className="text-accent">Bemerkenswert:</strong> C₂ hängt nicht mehr von C₁ ab!
+            Es ist eine <em>direkte</em> Funktion von G, P und dem initialen C₀.
+          </p>
+          {step === 4 && (
+            <button onClick={() => setStep(5)} className="mt-2 text-sm text-accent hover:underline">
+              Zeige alle Carry-Gleichungen →
+            </button>
+          )}
+        </ExplanationBox>
+      )}
+
+      {/* Step 5: All carry equations + interactive */}
+      {step >= 5 && (
+        <div className="space-y-4">
+          <h3 className="text-sm font-medium text-text-secondary">Alle Carries auf einmal</h3>
+
+          <div className="flex items-center gap-6 flex-wrap">
+            <BitInput label="A" value={a} onChange={setA} bits={4} />
+            <span className="text-xl text-text-muted">+</span>
+            <BitInput label="B" value={b} onChange={setB} bits={4} />
+          </div>
+
+          {/* G and P display */}
+          <div className="bg-surface-secondary rounded p-4">
+            <div className="flex justify-center gap-6 text-center">
+              {[3, 2, 1, 0].map(i => (
+                <div key={i} className="min-w-[60px]">
+                  <div className="text-xs text-text-muted mb-1">Bit {i}</div>
+                  <div className={`font-mono font-bold ${g[3-i] ? 'text-positive' : 'text-text-muted'}`}>
+                    G{i}={g[3-i]}
+                  </div>
+                  <div className={`font-mono font-bold ${p[3-i] ? 'text-accent' : 'text-text-muted'}`}>
+                    P{i}={p[3-i]}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Carry equations */}
+          <div className="font-mono text-sm space-y-2 p-4 bg-surface rounded border border-border">
+            <div className="flex items-center gap-4">
+              <span className="w-48">C₁ = G₀ + P₀·C₀</span>
+              <span className="text-text-muted">=</span>
+              <span className={c1 ? 'text-positive font-bold' : 'text-text-muted'}>{c1}</span>
+            </div>
+            <div className="flex items-center gap-4">
+              <span className="w-48">C₂ = G₁ + P₁·G₀ + P₁·P₀·C₀</span>
+              <span className="text-text-muted">=</span>
+              <span className={c2 ? 'text-positive font-bold' : 'text-text-muted'}>{c2}</span>
+            </div>
+            <div className="flex items-center gap-4">
+              <span className="w-48 text-xs">C₃ = G₂ + P₂·G₁ + P₂·P₁·G₀ + ...</span>
+              <span className="text-text-muted">=</span>
+              <span className={c3 ? 'text-positive font-bold' : 'text-text-muted'}>{c3}</span>
+            </div>
+            <div className="flex items-center gap-4">
+              <span className="w-48 text-xs">C₄ = G₃ + P₃·G₂ + P₃·P₂·G₁ + ...</span>
+              <span className="text-text-muted">=</span>
+              <span className={c4 ? 'text-positive font-bold' : 'text-text-muted'}>{c4}</span>
+            </div>
+          </div>
+
+          <ExplanationBox type="success">
+            <p className="text-text-secondary">
+              <strong>Alle Carries parallel!</strong> Keine Kette mehr, kein Warten.
+              Jeder Carry ist eine direkte Funktion von G, P und C₀.
+            </p>
+            {step === 5 && (
+              <button onClick={() => setStep(6)} className="mt-2 text-sm text-accent hover:underline">
+                Aber was ist der Haken? →
+              </button>
+            )}
+          </ExplanationBox>
+        </div>
+      )}
+
+      {/* Step 6: The catch - fan-in */}
+      {step >= 6 && (
+        <div className="space-y-4">
+          <ExplanationBox type="problem">
+            <p className="font-medium text-negative">Das Problem: Gate Fan-In</p>
+            <p className="text-text-secondary mt-2">
+              Schau dir den letzten Term von C₄ an:
+            </p>
+            <div className="font-mono text-sm mt-2 p-2 bg-surface rounded">
+              P₃ · P₂ · P₁ · P₀ · C₀ → <span className="text-negative font-bold">5-Input AND</span>
+            </div>
+            <p className="text-text-secondary mt-3">
+              Für <strong>n Bits</strong> brauchen wir ein <strong>n-Input AND-Gate</strong>.
+            </p>
+          </ExplanationBox>
+
+          {/* Fan-in growth visualization */}
+          <div className="bg-surface-secondary rounded p-4">
+            <div className="text-sm font-medium text-center mb-3">Größtes AND-Gate nach Bitbreite</div>
+            <svg viewBox="0 0 300 120" className="w-full max-w-md mx-auto">
+              {/* Bars */}
+              {[
+                { bits: 4, height: 20 },
+                { bits: 8, height: 40 },
+                { bits: 16, height: 60 },
+                { bits: 32, height: 80 },
+                { bits: 64, height: 100 },
+              ].map((d, i) => (
+                <g key={i}>
+                  <rect
+                    x={20 + i * 56}
+                    y={110 - d.height}
+                    width={40}
+                    height={d.height}
+                    rx={2}
+                    className={d.bits > 8 ? 'fill-negative/60' : 'fill-accent/60'}
+                  />
+                  <text x={40 + i * 56} y={105 - d.height} textAnchor="middle" className="text-[9px] fill-text-secondary">
+                    {d.bits}
+                  </text>
+                  <text x={40 + i * 56} y={118} textAnchor="middle" className="text-[8px] fill-text-muted">
+                    {d.bits} Bit
+                  </text>
+                </g>
+              ))}
+              {/* Practical limit line */}
+              <line x1={15} y1={70} x2={285} y2={70} className="stroke-negative" strokeWidth={1} strokeDasharray="4" />
+              <text x={290} y={74} textAnchor="end" className="text-[8px] fill-negative">Praktisches Limit (~8)</text>
+            </svg>
+          </div>
+
+          <ExplanationBox type="info">
+            <p className="text-text-secondary">
+              Physische Gates haben typischerweise maximal <strong>4-8 Eingänge</strong>.
+              Ein 64-Input AND-Gate ist nicht praktikabel!
+            </p>
+            {step === 6 && (
+              <button onClick={() => { setStep(7); onComplete?.() }} className="mt-2 text-sm text-accent hover:underline">
+                Gibt es eine Lösung? →
+              </button>
+            )}
+          </ExplanationBox>
+        </div>
+      )}
+
+      {/* Step 7: Teaser for Parallel Prefix */}
+      {step >= 7 && (
+        <ExplanationBox type="aha">
+          <p className="font-medium text-accent">Die Einsicht bleibt wertvoll!</p>
+          <p className="text-text-secondary mt-2">
+            CLA zeigt uns: Carries <em>können</em> parallel berechnet werden mit G und P.
+            Aber die Gleichungen wachsen zu schnell.
+          </p>
+          <p className="text-text-secondary mt-2">
+            <strong>Was wäre, wenn wir G und P-Werte in einer Baumstruktur kombinieren könnten?</strong>
+          </p>
+          <p className="text-text-secondary mt-2 text-sm">
+            Dann bräuchten wir nur O(log n) Ebenen statt O(n)-große Gates...
+          </p>
+          <p className="text-accent mt-3 font-medium">
+            → Nächstes Kapitel: Parallel Prefix – die elegante Lösung!
+          </p>
+        </ExplanationBox>
+      )}
+    </div>
+  )
+}
+
+// ============================================
 // CHAPTER 6: CARRY SELECT
 // ============================================
 function Chapter6CarrySelect({ onComplete }) {
@@ -1783,9 +2205,9 @@ function Chapter6CarrySelect({ onComplete }) {
 }
 
 // ============================================
-// CHAPTER 7: PARALLEL PREFIX
+// CHAPTER 8: PARALLEL PREFIX
 // ============================================
-function Chapter7ParallelPrefix({ onComplete }) {
+function Chapter8ParallelPrefix({ onComplete }) {
   const [a, setA] = useState(13)
   const [b, setB] = useState(7)
   const [step, setStep] = useState(0)
@@ -1811,37 +2233,24 @@ function Chapter7ParallelPrefix({ onComplete }) {
         <BitInput label="B" value={b} onChange={setB} bits={4} />
       </div>
 
-      {/* G and P explanation */}
+      {/* G and P recap */}
       <div className="space-y-4">
         <h3 className="text-sm font-medium text-text-secondary">Generate und Propagate</h3>
 
         <ExplanationBox type={step >= 1 ? 'aha' : 'info'}>
           <p className="text-text-secondary">
-            Zwei wichtige Signale pro Bit-Position:
+            Aus dem letzten Kapitel kennen wir <strong>G</strong> und <strong>P</strong>.
+            CLA zeigte uns, dass Carries parallel berechenbar sind – aber die Gleichungen wachsen zu schnell.
           </p>
-          <ul className="text-text-secondary mt-2 text-sm list-disc list-inside space-y-1">
-            <li><strong>Generate (G)</strong>: Ein Carry wird <em>erzeugt</em> wenn A=1 UND B=1</li>
-            <li><strong>Propagate (P)</strong>: Ein Carry wird <em>weitergeleitet</em> wenn A=1 XOR B=1</li>
-          </ul>
+          <p className="text-text-secondary mt-2">
+            <strong>Die Lösung:</strong> Wir kombinieren G und P in einer <em>Baumstruktur</em>!
+          </p>
           {step === 0 && (
             <button onClick={() => setStep(1)} className="mt-2 text-sm text-accent hover:underline">
-              Zeige G und P →
+              Zeige G und P für diese Eingabe →
             </button>
           )}
         </ExplanationBox>
-
-        {/* Video link */}
-        <div className="flex items-center gap-2 text-sm text-text-muted">
-          <span>📺</span>
-          <a
-            href="https://www.youtube.com/watch?v=yj6wo5SCObY"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-accent hover:underline"
-          >
-            Video-Erklärung: Carry Look-Ahead Addierer (Englisch)
-          </a>
-        </div>
       </div>
 
       {/* G/P values */}
@@ -1988,9 +2397,9 @@ function Chapter7ParallelPrefix({ onComplete }) {
 }
 
 // ============================================
-// CHAPTER 8: CARRY SAVE
+// CHAPTER 9: CARRY SAVE
 // ============================================
-function Chapter8CarrySave({ onComplete }) {
+function Chapter9CarrySave({ onComplete }) {
   const [a, setA] = useState(7)
   const [b, setB] = useState(9)
   const [c, setC] = useState(5)
